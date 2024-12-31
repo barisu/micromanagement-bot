@@ -6,17 +6,19 @@
   "scripts": {
     "build": "tsc",
     "start": "node -r dotenv/config dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^22.10.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   },
   "dependencies": {
     "@slack/bolt": "^4.1.1",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "googleapis": "^144.0.0"
   }
 }
