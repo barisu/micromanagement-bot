@@ -1,9 +1,9 @@
 import { describe, it, beforeAll, afterAll, expect } from "vitest";
 import { google, tasks_v1 } from "googleapis";
-import { GoogleTasksToDoService } from "../../domain/service/GoogleTasksToDoService";
-import { ToDo } from "../../domain/entity/ToDo";
+import { GoogleTasksToDoService } from "../../src/adapter/GoogleTasksToDoService";
+import { ToDo } from "../../src/domain/entity/ToDo";
 import { readFileSync } from "fs";
-import { SCOPE_URLS } from "../../constants";
+import { SCOPE_URLS } from "../../src/constants";
 
 describe("GoogleTasksToDoService Integration Tests", () => {
   let service: GoogleTasksToDoService;
@@ -35,7 +35,7 @@ describe("GoogleTasksToDoService Integration Tests", () => {
     const taskListId = testTaskListId;
 
     // サービスインスタンスを初期化
-    service = new GoogleTasksToDoService(taskListId);
+    service = new GoogleTasksToDoService(auth,taskListId);
   });
 
   afterAll(async () => {

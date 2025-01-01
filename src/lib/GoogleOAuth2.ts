@@ -2,8 +2,10 @@ import { google, Auth } from 'googleapis';
 
 export class GoogleOAuth2 {
     private static oauth2Client: Auth.OAuth2Client;
+    private static refreshToken: string;
+    private static accessToken: string;
 
-    constructor() {}
+    constructor() { }
 
     /**
      * OAuth2 クライアントを初期化する
@@ -12,12 +14,18 @@ export class GoogleOAuth2 {
         if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET || !process.env.REDIRECT_URI) {
             throw new Error('OAuth2 client configuration is missing.');
         }
+        if (!process.env.REFRESH_TOKEN) {
+            throw new Error('Refresh token is missing.');
+        }
         const clientId = process.env.CLIENT_ID;
         const clientSecret = process.env.CLIENT_SECRET;
         const redirectUri = process.env.REDIRECT_URI;
+        this.refreshToken = process.env.REFRESH_TOKEN;
 
-        if (!this.oauth2Client)
+        if (!this.oauth2Client) {
             this.oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+            this.oauth2Client.setCredentials({ refresh_token: this.refreshToken });
+        }
     }
 
     /**
@@ -53,6 +61,8 @@ export class GoogleOAuth2 {
         }
 
         this.oauth2Client.setCredentials(tokens);
+        this.accessToken = tokens.access_token;
+        this.refreshToken = tokens.refresh_token;
 
         return {
             accessToken: tokens.access_token,
@@ -69,18 +79,27 @@ export class GoogleOAuth2 {
         if (!this.oauth2Client) {
             this.init();
         }
-        this.oauth2Client.setCredentials({ refresh_token: refreshToken });
+
         const { credentials } = await this.oauth2Client.refreshAccessToken();
+
+        if (!credentials?.refresh_token) {
+            credentials.refresh_token = refreshToken;
+        }
+
         if (!credentials.access_token) {
             throw new Error('Failed to refresh access token.');
         }
 
+        this.oauth2Client.setCredentials(credentials);
         return credentials.access_token;
     }
 
     public static getAuthClient(): Auth.OAuth2Client {
         if (!this.oauth2Client) {
             this.init();
+        }
+        if (!this.accessToken) {
+            this.refreshAccessToken(this.refreshToken);
         }
         return this.oauth2Client;
     }

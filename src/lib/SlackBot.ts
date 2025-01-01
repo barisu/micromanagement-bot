@@ -1,18 +1,24 @@
-const { App } = require("@slack/bolt");
+const { App, ExpressReceiver } = require("@slack/bolt");
 
-class Server {
-    private app: any;
+class SlackClient {
+    private boltApp: typeof App;
+    private receiver: typeof ExpressReceiver;
 
     constructor() {
-        this.app = new App({
+        this.receiver = new ExpressReceiver({
+            signingSecret: process.env.SLACK_SIGNING_SECRET,
+            processBeforeResponse: true,
+        });
+        this.boltApp = new App({
             token: process.env.SLACK_BOT_TOKEN,
-            signingSecret: process.env.SLACK_SIGNING_SECRET
+            signingSecret: process.env.SLACK_SIGNING_SECRET,
+            receiver: this.receiver
         });
     }
 
     async postMessage(channel: string, text: string) {
         try {
-            await this.app.client.chat.postMessage({
+            await this.boltApp.client.chat.postMessage({
                 channel: channel,
                 text: text
             });
@@ -23,9 +29,22 @@ class Server {
     }
 
     async start() {
-        await this.app.start(3000);
+        await this.boltApp.start(3000);
         console.log('⚡️ Bolt app is running!');
+    }
+
+    async stop() {
+        await this.boltApp.stop();
+        console.log('⚡️ Bolt app is stopped!');
+    }
+
+    getBoltApp() {
+        return this.boltApp;
+    }
+
+    getReceiver() {
+        return this.receiver;
     }
 }
 
-export default Server;
+export default SlackClient;

@@ -42,4 +42,10 @@ export interface ToDoService {
    * @returns The updated ToDo item, or null if not found.
    */
   markAsCompleted(id: string): Promise<ToDo | null>;
+
+  /**
+   * Retrieve ToDo items with deadlines approaching.
+   * @returns A list of ToDo items with deadlines within the next 24 hours.
+   */
+  getDeadlineApproachingTodos(): Promise<(ToDo & Required<Pick<ToDo, 'dueDate'>>)[]>;
 }

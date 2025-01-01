@@ -1,32 +1,16 @@
-import { google, tasks_v1 } from "googleapis";
-import { ToDoService } from "./ToDoService";
-import { ToDo } from "../entity/ToDo";
-import { GoogleOAuth2 } from "../../lib/GoogleOAuth2";
-import { GoogleServiceAccountAuth } from "../../lib/GoogleServiceAccountAuth";
-import { SCOPE_URLS } from "../../constants";
+import { google, tasks_v1, Auth } from "googleapis";
+import { ToDoService } from "../domain/service/ToDoService";
+import { ToDo } from "../domain/entity/ToDo";
 
 export class GoogleTasksToDoService implements ToDoService {
-    private auth: any;
     private taskListId: string;
     private tasks: tasks_v1.Tasks;
 
-    constructor(taskListId: string) {
+    constructor(auth: Auth.OAuth2Client | Auth.GoogleAuth, taskListId: string) {
+        this.tasks = google.tasks({ version: "v1", auth: auth });
 
-        if (process.env.NODE_ENV !== "test") {
-            this.auth = GoogleOAuth2.getAuthClient();
-            const url = GoogleOAuth2.generateAuthUrl(SCOPE_URLS);
-            console.log(`Please visit this URL to authorize this application: ${url}`);
-            this.tasks = google.tasks({ version: "v1", auth: this.auth });
-
-            if (!process.env.TASK_LIST_ID) throw new Error("TASK_LIST_ID is not set.");
-            this.taskListId = taskListId;
-        } else {
-            this.auth = GoogleServiceAccountAuth.getAuthClient();
-            this.tasks = google.tasks({ version: "v1", auth: this.auth });
-
-            if (!process.env.TASK_LIST_ID) throw new Error("TASK_LIST_ID is not set.");
-            this.taskListId = taskListId;
-        }
+        if (!process.env.TASK_LIST_ID) throw new Error("TASK_LIST_ID is not set.");
+        this.taskListId = taskListId;
     }
 
     // タスクを作成する
@@ -175,5 +159,13 @@ export class GoogleTasksToDoService implements ToDoService {
             updatedAt: new Date(updatedTask.data.updated || ""),
         };
     }
-}
 
+    async getDeadlineApproachingTodos(): Promise<(ToDo & Required<Pick<ToDo, 'dueDate'>>)[]> {
+        const tasks = await this.getToDos();
+        const now = new Date();
+        const deadline = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 1日後
+
+       return tasks.filter(task => task.dueDate && task.dueDate < deadline)
+            .map(task => ({ ...task, dueDate: task.dueDate! }));
+    }
+}
