@@ -48,4 +48,11 @@ export interface ToDoService {
    * @returns A list of ToDo items with deadlines within the next 24 hours.
    */
   getDeadlineApproachingTodos(): Promise<(ToDo & Required<Pick<ToDo, 'dueDate'>>)[]>;
+
+  /**
+   * Format a ToDo item as a string for display.
+   * @param todo The ToDo item to format.
+   * @returns A formatted string representing the ToDo item.
+   */
+  formatToDo(todo: ToDo): string;
 }

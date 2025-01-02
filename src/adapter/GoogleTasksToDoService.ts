@@ -168,4 +168,9 @@ export class GoogleTasksToDoService implements ToDoService {
        return tasks.filter(task => task.dueDate && task.dueDate < deadline)
             .map(task => ({ ...task, dueDate: task.dueDate! }));
     }
+
+    formatToDo(todo: ToDo): string {
+        const formattedDate = todo.dueDate ? todo.dueDate.toLocaleDateString() : "No due date";
+        return `ID: ${todo.id}\nTitle: ${todo.title}\nDescription: ${todo.description}\nDue Date: ${formattedDate}\nStatus: ${todo.status}\nCreated At: ${todo.createdAt.toLocaleString()}\nUpdated At: ${todo.updatedAt.toLocaleString()}\n`;
+    }
 }

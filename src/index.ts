@@ -4,18 +4,21 @@ import { GoogleTasksToDoService } from './adapter/GoogleTasksToDoService';
 import { ToDoService } from './domain/service/ToDoService';
 import { GoogleServiceAccountAuth } from './lib/GoogleServiceAccountAuth';
 import { SCOPE_URLS } from './constants';
-import { getTaskLists } from './getTaskList';
 
 import { Request, Response } from 'express';
+import { ToDoCheck } from './cron/ToDoCheck';
+import { SlackMessageService } from './adapter/SlackMessageService';
 
 const slackClient = new SlackClient();
 
 const isTest = process.env.NODE_ENV === 'test';
-const auth = isTest ? GoogleOAuth2.getAuthClient() : GoogleServiceAccountAuth.getAuthClient();
+const auth = isTest ? GoogleServiceAccountAuth.getAuthClient() : GoogleOAuth2.getAuthClient();
 
 if (process.env.TASK_LIST_ID == null)
     throw Error('タスクリストIDが指定されていません。');
-export const todoService: ToDoService = new GoogleTasksToDoService(auth, process.env.TASK_LIST_ID);
+
+const todoService: ToDoService = new GoogleTasksToDoService(auth, process.env.TASK_LIST_ID);
+const slackMessageService = new SlackMessageService(slackClient, todoService);
 
 slackClient.getReceiver().router.get('/auth/google', async (req: Request, res: Response) => {
     const url = GoogleOAuth2.generateAuthUrl(SCOPE_URLS);
@@ -43,3 +46,6 @@ slackClient.getReceiver().router.get('/auth/callback', async (req: Request, res:
     if (process.env.SLACK_CHANNEL == null)
         throw Error('チャンネル名が指定されていません。');
 })();
+
+// 定期実行処理
+new ToDoCheck(todoService, slackMessageService);
