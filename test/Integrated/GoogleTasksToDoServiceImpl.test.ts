@@ -106,4 +106,35 @@ describe("GoogleTasksToDoService Integration Tests", () => {
     const deletedTask = await service.getToDoById(task.id);
     expect(deletedTask).toBeNull();
   });
+
+  it("should get tasks from the last week", async () => {
+    // Create tasks with different due dates
+    const futureTask = await service.createToDo({
+        title: "Future Task",
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days ahead
+    });
+
+    const recentTask = await service.createToDo({
+        title: "Recent Task",
+        dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+    });
+
+    const oldTask = await service.createToDo({
+        title: "Old Task",
+        dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+    });
+
+    const recentWeekTasks = await service.getRecentWeekTodos();
+
+    // Verify results
+    expect(recentWeekTasks).toBeInstanceOf(Array);
+    expect(recentWeekTasks.some(task => task.id === recentTask.id)).toBe(true);
+    expect(recentWeekTasks.some(task => task.id === futureTask.id)).toBe(false);
+    expect(recentWeekTasks.some(task => task.id === oldTask.id)).toBe(false);
+
+    // Cleanup
+    await service.deleteToDo(futureTask.id);
+    await service.deleteToDo(recentTask.id);
+    await service.deleteToDo(oldTask.id);
+});
 });

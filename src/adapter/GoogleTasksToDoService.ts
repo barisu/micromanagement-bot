@@ -173,4 +173,28 @@ export class GoogleTasksToDoService implements ToDoService {
         const formattedDate = todo.dueDate ? todo.dueDate.toLocaleDateString() : "No due date";
         return `ID: ${todo.id}\nTitle: ${todo.title}\nDescription: ${todo.description}\nDue Date: ${formattedDate}\nStatus: ${todo.status}\nCreated At: ${todo.createdAt.toLocaleString()}\nUpdated At: ${todo.updatedAt.toLocaleString()}\n`;
     }
+
+    async getRecentWeekTodos(): Promise<ToDo[]> {
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7日前
+        
+        const response = await this.tasks.tasks.list({
+            tasklist: this.taskListId,
+            dueMin: oneWeekAgo.toISOString(),
+            dueMax: now.toISOString(),
+        });
+
+        if (!response.data.items) return [];
+
+        return response.data.items.map(task => ({
+            id: task.id || "",
+            userId: "",
+            title: task.title || "",
+            description: task.notes || "",
+            status: task.status === "completed" ? "completed" : "pending",
+            dueDate: task.due ? new Date(task.due) : undefined,
+            createdAt: new Date(task.updated || ""),
+            updatedAt: new Date(task.updated || ""),
+        }));
+    }
 }

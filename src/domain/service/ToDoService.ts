@@ -55,4 +55,10 @@ export interface ToDoService {
    * @returns A formatted string representing the ToDo item.
    */
   formatToDo(todo: ToDo): string;
+
+  /**
+   * Retrive a list of ToDo items that are recent week.
+   * @returns A list of ToDo items that are created in the recent week.
+   */
+  getRecentWeekTodos(): Promise<ToDo[]>;
 }
