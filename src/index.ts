@@ -20,16 +20,16 @@ if (process.env.TASK_LIST_ID == null)
 const todoService: ToDoService = new GoogleTasksToDoService(auth, process.env.TASK_LIST_ID);
 const slackMessageService = new SlackMessageService(slackClient, todoService);
 
-slackClient.getReceiver().router.get('/auth/google', async (req: Request, res: Response) => {
-    const url = GoogleOAuth2.generateAuthUrl(SCOPE_URLS);
-    res.redirect(url);
-});
+// slackClient.getReceiver().router.get('/auth/google', async (req: Request, res: Response) => {
+//     const url = GoogleOAuth2.generateAuthUrl(SCOPE_URLS);
+//     res.redirect(url);
+// });
 
-slackClient.getReceiver().router.get('/auth/callback', async (req: Request, res: Response) => {
-    const code = req.query.code as string;
-    const { accessToken, refreshToken } = await GoogleOAuth2.getToken(code);
-    res.send(`Access token: ${accessToken}, Refresh token: ${refreshToken}`);
-});
+// slackClient.getReceiver().router.get('/auth/callback', async (req: Request, res: Response) => {
+//     const code = req.query.code as string;
+//     const { accessToken, refreshToken } = await GoogleOAuth2.getToken(code);
+//     res.send(`Access token: ${accessToken}, Refresh token: ${refreshToken}`);
+// });
 
 // slackClient.getReceiver().router.get('/todolist', async (req: Request, res: Response) => {
 //     const taskLists = await getTaskLists(GoogleOAuth2.getAuthClient());
