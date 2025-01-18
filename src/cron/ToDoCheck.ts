@@ -8,17 +8,15 @@ export class ToDoCheck {
         private notifyService: NotifyService
     ) {
         this.startDailyCheck();
-        // first check when the server starts
-        this.checkDeadlines();
     }
 
     private startDailyCheck(): void {
         const scheduleNextCheck = () => {
             const now = new Date();
             const nextCheck = new Date(now);
-            nextCheck.setHours(7, 0, 0, 0);
+            nextCheck.setHours(11, 0, 0, 0); // UTC 11:00 = JST 20:00
 
-            if (now.getHours() >= 7) {
+            if (now.getHours() >= 11) { // UTC 11時以降の場合は翌日にスケジュール
                 nextCheck.setDate(nextCheck.getDate() + 1);
             }
 
