@@ -2,12 +2,20 @@ import OpenAI from 'openai';
 import { AIAdvisorService } from '../domain/service/AIAdvisorService';
 import { ToDo } from '../domain/entity/ToDo';
 
+export enum LLMModel {
+    GPT35Turbo = 'gpt-3.5-turbo',
+    GPT4omini = 'gpt-4o-mini',
+    GPT4o = 'gpt-4o',
+}
+
 export class OpenAIAdvisorService implements AIAdvisorService {
     private openai: OpenAI;
+    private model: LLMModel;
     private readonly systemPrompt = "あなたはタスク管理アプリのアドバイザーです。やり取りは基本的に日本語で行います。基本的には優しく、しかし時には厳しく、しかし常に建設的なアドバイスを提供します。";
 
-    constructor() {
+    constructor(model: LLMModel = LLMModel.GPT4o) {
         this.openai = new OpenAI();
+        this.model = model;
     }
 
     async analyzeTodoProgress(todos: ToDo[]): Promise<string> {
@@ -23,7 +31,7 @@ export class OpenAIAdvisorService implements AIAdvisorService {
         `;
 
         const completion = await this.openai.chat.completions.create({
-            model: "gpt-4",
+            model: this.model,
             messages: [
                 { role: "system", content: this.systemPrompt },
                 { role: "user", content: prompt },
@@ -43,7 +51,7 @@ export class OpenAIAdvisorService implements AIAdvisorService {
         `;
 
         const completion = await this.openai.chat.completions.create({
-            model: "gpt-4",
+            model: this.model,
             messages: [
                 { role: "system", content: this.systemPrompt },
                 { role: "user", content: prompt },
@@ -64,7 +72,7 @@ export class OpenAIAdvisorService implements AIAdvisorService {
         `;
 
         const completion = await this.openai.chat.completions.create({
-            model: "gpt-4",
+            model: this.model,
             messages: [
                 { role: "system", content: this.systemPrompt },
                 { role: "user", content: prompt },
