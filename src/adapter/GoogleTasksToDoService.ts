@@ -164,6 +164,7 @@ export class GoogleTasksToDoService implements ToDoService {
         const tasks = await this.getToDos();
         const now = new Date();
         const deadline = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 1日後
+        console.log(deadline);
 
        return tasks.filter(task => task.dueDate && task.dueDate < deadline)
             .map(task => ({ ...task, dueDate: task.dueDate! }));
@@ -177,6 +178,7 @@ export class GoogleTasksToDoService implements ToDoService {
     async getRecentWeekTodos(): Promise<ToDo[]> {
         const now = new Date();
         const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7日前
+        console.log(oneWeekAgo);
         
         const response = await this.tasks.tasks.list({
             tasklist: this.taskListId,
