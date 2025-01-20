@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { AIAdvisorService } from '../domain/service/AIAdvisorService';
 import { ToDo } from '../domain/entity/ToDo';
+import { todo } from 'node:test';
 
 export enum LLMModel {
     GPT35Turbo = 'gpt-3.5-turbo',
@@ -11,7 +12,7 @@ export enum LLMModel {
 export class OpenAIAdvisorService implements AIAdvisorService {
     private openai: OpenAI;
     private model: LLMModel;
-    private readonly systemPrompt = "あなたはタスク管理アプリのアドバイザーです。やり取りは基本的に日本語で行います。基本的には優しく、しかし時には厳しく、しかし常に建設的なアドバイスを提供します。";
+    private readonly systemPrompt = "あなたはタスク管理アプリのアドバイザーです。やり取りは基本的に日本語で行います。あなたは常に建設的ですが、軽薄な話し方をします。またカジュアルに人を罵倒します。敬語は使いません。";
 
     constructor(model: LLMModel = LLMModel.GPT4o) {
         this.openai = new OpenAI();
@@ -19,16 +20,8 @@ export class OpenAIAdvisorService implements AIAdvisorService {
     }
 
     async analyzeTodoProgress(todos: ToDo[]): Promise<string> {
-        const completedTodos = todos.filter(todo => todo.status === 'completed');
-        const completionRate = (completedTodos.length / todos.length) * 100;
-
-        const prompt = `
-            タスクの完了率は${completionRate}%です。
-            完了タスク数: ${completedTodos.length}
-            未完了タスク数: ${todos.length - completedTodos.length}
-            
-            これらの情報を元に、タスクの進捗状況を分析し、建設的なアドバイスを提供してください。
-        `;
+        const todoSummary: string[] = todos.map(todo => JSON.stringify(todo));
+        const prompt = `タスクの状況は以下の通りです：\n${todoSummary.join('\n')}。タスクの状況を分析して、大げさ感想を述べてください。`;
 
         const completion = await this.openai.chat.completions.create({
             model: this.model,
@@ -43,11 +36,13 @@ export class OpenAIAdvisorService implements AIAdvisorService {
     async suggestImprovements(todos: ToDo[]): Promise<string> {
         const overdueTodos = todos.filter(todo =>
             todo.dueDate && todo.dueDate < new Date() && todo.status !== 'completed'
-        );
+        ).map(todo => JSON.stringify(todo));
 
         const prompt = `
-            以下の未完了の期限切れタスクについて、改善案を提案してください：
-            ${overdueTodos.map(todo => `- ${todo.title}`).join('\n')}
+            以下の未完了の期限切れタスクについて、改善点を提案してください：
+            ${overdueTodos.join('\n')}
+            ただし、提示する改善案は具体的で実行可能なものにしてください。例えば、今日の20時から30分間、バグ修正に取り組む、など。\n
+            達成が困難な場合には、リスケジュールを提案してください。
         `;
 
         const completion = await this.openai.chat.completions.create({
