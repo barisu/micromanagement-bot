@@ -3,12 +3,14 @@ import SlackClient from './lib/SlackBot';
 import { GoogleTasksToDoService } from './adapter/GoogleTasksToDoService';
 import { ToDoService } from './domain/service/ToDoService';
 import { GoogleServiceAccountAuth } from './lib/GoogleServiceAccountAuth';
-import { SCOPE_URLS } from './constants';
+import { SayFn } from '@slack/bolt';
+import { GenericMessageEvent } from '@slack/types';
 
 import { Request, Response } from 'express';
 import { ToDoCheck } from './cron/ToDoCheck';
 import { SlackMessageService } from './adapter/SlackMessageService';
 import { OpenAIAdvisorService } from './adapter/OpenAIAdvisorService';
+import { App } from '@slack/bolt';
 
 const slackClient = new SlackClient();
 
@@ -51,3 +53,23 @@ const openAIAdvisorService = new OpenAIAdvisorService();
 
 // 定期実行処理
 new ToDoCheck(todoService, slackMessageService,openAIAdvisorService);
+
+// slackClient.start()の前に以下のコードを追加
+slackClient.getBoltApp().event('app_mention', async ({ event, say }: {event: GenericMessageEvent, say: SayFn }) => {
+    const targetUserId = process.env.SLACK_USER_ID; // 特定のユーザーのSlack ID
+    if (targetUserId == null){
+        console.error('ユーザーIDが指定されていません。');
+        return;
+    }
+    const triggerPhrase = 'タスク状況'; // トリガーとなる特定の文字列
+    
+    if (event.user === targetUserId && event.text?.includes(triggerPhrase)) {
+        const tasks = await todoService.getRecentWeekTodos();
+        const analysis = await openAIAdvisorService.analyzeTodoProgress(tasks);
+        
+        await say({
+            text: analysis || 'なんかエラーが発生したみたいです',
+            thread_ts: event.thread_ts || event.ts
+        });
+    }
+});
