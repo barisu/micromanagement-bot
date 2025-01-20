@@ -3,7 +3,7 @@ import SlackClient from './lib/SlackBot';
 import { GoogleTasksToDoService } from './adapter/GoogleTasksToDoService';
 import { ToDoService } from './domain/service/ToDoService';
 import { GoogleServiceAccountAuth } from './lib/GoogleServiceAccountAuth';
-import { SayFn, AckFn } from '@slack/bolt';
+import { SayFn } from '@slack/bolt';
 import { GenericMessageEvent } from '@slack/types';
 
 import { Request, Response } from 'express';
@@ -55,16 +55,12 @@ const openAIAdvisorService = new OpenAIAdvisorService();
 new ToDoCheck(todoService, slackMessageService,openAIAdvisorService);
 
 // slackClient.start()の前に以下のコードを追加
-slackClient.getBoltApp().event('app_mention', async ({ event, say, ack }: {event: GenericMessageEvent, say: SayFn, ack: AckFn<void>  }) => {
+slackClient.getBoltApp().event('app_mention', async ({ event, say }: {event: GenericMessageEvent, say: SayFn }) => {
     const targetUserId = process.env.SLACK_USER_ID; // 特定のユーザーのSlack ID
     if (targetUserId == null){
         console.error('ユーザーIDが指定されていません。');
         return;
     }
-
-    // LLM APIの呼び出しが遅く、Retry処理が行われてしまうため一旦ackを返す
-    await ack();
-
     const triggerPhrase = 'タスク状況'; // トリガーとなる特定の文字列
     
     if (event.user === targetUserId && event.text?.includes(triggerPhrase)) {
