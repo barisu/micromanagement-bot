@@ -1,11 +1,13 @@
 import { ToDoService } from "../domain/service/ToDoService";
 import { NotifyService } from "../domain/service/NotifyService";
+import { AIAdvisorService } from "../domain/service/AIAdvisorService";
 
 export class ToDoCheck {
 
     constructor(
         private todoService: ToDoService,
-        private notifyService: NotifyService
+        private notifyService: NotifyService,
+        private advisorService: AIAdvisorService
     ) {
         this.startDailyCheck();
     }
@@ -23,7 +25,8 @@ export class ToDoCheck {
             const timeUntilNextCheck = nextCheck.getTime() - now.getTime();
 
             setTimeout(async () => {
-                await this.checkDeadlines()
+                await this.checkDeadlines();
+                await this.recentTodosSummaryReport();
                 scheduleNextCheck();
             }, timeUntilNextCheck);
         };
@@ -42,6 +45,16 @@ export class ToDoCheck {
             }
         } catch (error) {
             console.error('Failed to check deadlines:', error);
+        }
+    }
+
+    private async recentTodosSummaryReport(): Promise<void> {
+        try {
+            const recentTodos = await this.todoService.getRecentWeekTodos();
+            const analysis = await this.advisorService.analyzeTodoProgress(recentTodos);
+            await this.notifyService.notify(analysis);
+        } catch (error) {
+            console.error('Failed to generate recent todos summary report:', error);
         }
     }
 }
