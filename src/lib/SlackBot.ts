@@ -1,4 +1,5 @@
 const { App, ExpressReceiver } = require("@slack/bolt");
+import { Context } from '@slack/bolt';
 
 class SlackClient {
     private boltApp: typeof App;
@@ -13,6 +14,15 @@ class SlackClient {
             token: process.env.SLACK_BOT_TOKEN,
             signingSecret: process.env.SLACK_SIGNING_SECRET,
             receiver: this.receiver
+        });
+
+        this.boltApp.use(async ({context, next}: { context: Context, next: () => Promise<void> }) => {
+            // Ignore Retry Requests
+            if (context.retryNum){
+                return;
+            }
+
+            await next();
         });
     }
 
