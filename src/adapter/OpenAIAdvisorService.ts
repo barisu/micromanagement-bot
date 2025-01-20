@@ -1,7 +1,6 @@
 import OpenAI from 'openai';
 import { AIAdvisorService } from '../domain/service/AIAdvisorService';
 import { ToDo } from '../domain/entity/ToDo';
-import { todo } from 'node:test';
 
 export enum LLMModel {
     GPT35Turbo = 'gpt-3.5-turbo',
@@ -21,7 +20,10 @@ export class OpenAIAdvisorService implements AIAdvisorService {
 
     async analyzeTodoProgress(todos: ToDo[]): Promise<string> {
         const todoSummary: string[] = todos.map(todo => JSON.stringify(todo));
-        const prompt = `タスクの状況は以下の通りです：\n${todoSummary.join('\n')}。タスクの状況を分析して、大げさ感想を述べてください。`;
+        
+        const prompt = todoSummary.length === 0 ?
+            "タスクはすべて完了しています。褒めたたえてください。" :
+             `タスクの状況は以下の通りです：\n${todoSummary.join('\n')}。タスクの状況を分析して、大げさ感想を述べてください。`  
 
         const completion = await this.openai.chat.completions.create({
             model: this.model,
@@ -38,7 +40,10 @@ export class OpenAIAdvisorService implements AIAdvisorService {
             todo.dueDate && todo.dueDate < new Date() && todo.status !== 'completed'
         ).map(todo => JSON.stringify(todo));
 
-        const prompt = `
+        const prompt = 
+            overdueTodos.length === 0 ?
+            "期限切れのタスクはありません。褒めたたえてください。" :
+            `
             以下の未完了の期限切れタスクについて、改善点を提案してください：
             ${overdueTodos.join('\n')}
             ただし、提示する改善案は具体的で実行可能なものにしてください。例えば、今日の20時から30分間、バグ修正に取り組む、など。\n
@@ -59,7 +64,10 @@ export class OpenAIAdvisorService implements AIAdvisorService {
     async getPrioritySuggestions(todos: ToDo[]): Promise<string> {
         const pendingTodos = todos.filter(todo => todo.status !== 'completed');
 
-        const prompt = `
+        const prompt = 
+            pendingTodos.length === 0 ?
+            "未完了のタスクはありません。褒めたたえてください。" :
+            `
             以下の未完了タスクの優先順位付けを提案してください：
             ${pendingTodos.map(todo =>
             `- ${todo.title} (期限: ${todo.dueDate?.toLocaleDateString()})`
