@@ -1,13 +1,13 @@
 import { ToDoService } from "../domain/service/ToDoService";
 import { NotifyService } from "../domain/service/NotifyService";
-import { AIAdvisorService } from "../domain/service/AIAdvisorService";
+import { RecentTodosSummaryReportUseCase } from "../usecase/RecentTodosSummaryReportUseCase";
 
 export class ToDoCheck {
 
     constructor(
         private todoService: ToDoService,
         private notifyService: NotifyService,
-        private advisorService: AIAdvisorService
+        private recentTodosSummaryReportUseCase: RecentTodosSummaryReportUseCase
     ) {
         this.startDailyCheck();
     }
@@ -50,8 +50,7 @@ export class ToDoCheck {
 
     private async recentTodosSummaryReport(): Promise<void> {
         try {
-            const recentTodos = await this.todoService.getRecentWeekTodos();
-            const analysis = await this.advisorService.analyzeTodoProgress(recentTodos);
+            const analysis = await this.recentTodosSummaryReportUseCase.execute();
             await this.notifyService.notify(analysis);
         } catch (error) {
             console.error('Failed to generate recent todos summary report:', error);

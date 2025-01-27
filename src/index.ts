@@ -11,6 +11,7 @@ import { ToDoCheck } from './cron/ToDoCheck';
 import { SlackMessageService } from './adapter/SlackMessageService';
 import { OpenAIAdvisorService } from './adapter/OpenAIAdvisorService';
 import { App } from '@slack/bolt';
+import { RecentTodosSummaryReportUseCase } from './usecase/RecentTodosSummaryReportUseCase';
 
 const slackClient = new SlackClient();
 
@@ -23,6 +24,10 @@ if (process.env.TASK_LIST_ID == null)
 const todoService: ToDoService = new GoogleTasksToDoService(auth, process.env.TASK_LIST_ID);
 const slackMessageService = new SlackMessageService(slackClient, todoService);
 const openAIAdvisorService = new OpenAIAdvisorService();
+const recentTodosSummaryReportUseCase = new RecentTodosSummaryReportUseCase(
+    todoService,
+    openAIAdvisorService
+);
 
 // slackClient.getReceiver().router.get('/auth/google', async (req: Request, res: Response) => {
 //     const url = GoogleOAuth2.generateAuthUrl(SCOPE_URLS);
@@ -52,7 +57,7 @@ const openAIAdvisorService = new OpenAIAdvisorService();
 })();
 
 // 定期実行処理
-new ToDoCheck(todoService, slackMessageService,openAIAdvisorService);
+new ToDoCheck(todoService, slackMessageService,recentTodosSummaryReportUseCase);
 
 // slackClient.start()の前に以下のコードを追加
 slackClient.getBoltApp().event('app_mention', async ({ event, say }: {event: GenericMessageEvent, say: SayFn }) => {
@@ -64,9 +69,8 @@ slackClient.getBoltApp().event('app_mention', async ({ event, say }: {event: Gen
     const triggerPhrase = 'タスク状況'; // トリガーとなる特定の文字列
     
     if (event.user === targetUserId && event.text?.includes(triggerPhrase)) {
-        const tasks = await todoService.getRecentWeekTodos();
-        const analysis = await openAIAdvisorService.analyzeTodoProgress(tasks);
-        
+        const analysis = await recentTodosSummaryReportUseCase.execute();
+
         await say({
             text: analysis || 'なんかエラーが発生したみたいです',
             thread_ts: event.thread_ts || event.ts
