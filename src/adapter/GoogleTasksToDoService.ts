@@ -2,6 +2,9 @@ import { google, tasks_v1, Auth } from "googleapis";
 import { ToDoService } from "../domain/service/ToDoService";
 import { ToDo } from "../domain/entity/ToDo";
 
+import { injectable } from 'typed-inject';
+
+@injectable()
 export class GoogleTasksToDoService implements ToDoService {
     private taskListId: string;
     private tasks: tasks_v1.Tasks;

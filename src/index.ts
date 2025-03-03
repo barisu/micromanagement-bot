@@ -1,4 +1,5 @@
 import { GoogleOAuth2 } from './lib/GoogleOAuth2';
+import { Container, injectable, inject } from 'typed-inject';
 import SlackClient from './lib/SlackBot';
 import { GoogleTasksToDoService } from './adapter/GoogleTasksToDoService';
 import { ToDoService } from './domain/service/ToDoService';

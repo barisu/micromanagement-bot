@@ -2,6 +2,9 @@
 import { ToDoService } from "../domain/service/ToDoService";
 import { AIAdvisorService } from "../domain/service/AIAdvisorService";
 
+import { injectable, inject } from 'typed-inject';
+
+@injectable()
 export class RecentTodosSummaryReportUseCase {
     constructor(
         private todoService: ToDoService,
