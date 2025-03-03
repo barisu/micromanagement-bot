@@ -8,6 +8,10 @@ export enum LLMModel {
     GPT4o = 'gpt-4o',
 }
 
+import { injectable } from 'typed-inject';
+import { AIAdvisorService } from '../domain/service/AIAdvisorService';
+
+@injectable()
 export class OpenAIAdvisorService implements AIAdvisorService {
     private openai: OpenAI;
     private model: LLMModel;

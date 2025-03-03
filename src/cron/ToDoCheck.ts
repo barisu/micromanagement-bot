@@ -2,6 +2,9 @@ import { ToDoService } from "../domain/service/ToDoService";
 import { NotifyService } from "../domain/service/NotifyService";
 import { RecentTodosSummaryReportUseCase } from "../usecase/RecentTodosSummaryReportUseCase";
 
+import { injectable, inject } from 'typed-inject';
+
+@injectable()
 export class ToDoCheck {
 
     constructor(
