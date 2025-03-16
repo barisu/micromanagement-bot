@@ -11,7 +11,7 @@ import { SlackMessageService } from './adapter/SlackMessageService';
 import { OpenAIAdvisorService } from './adapter/OpenAIAdvisorService';
 import { RecentTodosSummaryReportUseCase } from './usecase/RecentTodosSummaryReportUseCase';
 
-import {APIGatewayEvent, Context, ProxyCallback,} from 'aws-lambda';
+import {APIGatewayEvent, Context, ProxyCallback,EventBridgeEvent} from 'aws-lambda';
 
 const slackClient = new SlackClient();
 
@@ -79,8 +79,16 @@ slackClient.getBoltApp().event('app_mention', async ({ event, say }: {event: Gen
     }
 });
 
+interface CustomBridgeEvent {
+    eventType: string;
+}
+
 // Handle the Lambda function event
-export const handler = async (event: APIGatewayEvent, context: Context, callback: ProxyCallback) => {
+export const handler = async (event: APIGatewayEvent | CustomBridgeEvent, context: Context, callback: ProxyCallback) => {
+    if ('eventType' in event && event.eventType === 'dailyReport') {
+        const analysis = await recentTodosSummaryReportUseCase.execute();
+        await slackMessageService.notify(analysis || 'なんかエラーが発生したみたいです');
+    }
     const handler = await slackClient.getReceiver().start();
     return handler(event, context, callback);
 }
