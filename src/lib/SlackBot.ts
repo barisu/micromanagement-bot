@@ -1,19 +1,19 @@
-const { App, ExpressReceiver } = require("@slack/bolt");
+const { App, AwsLambdaReceiver } = require("@slack/bolt");
 import { Context } from '@slack/bolt';
 
 class SlackClient {
     private boltApp: typeof App;
-    private receiver: typeof ExpressReceiver;
+    private awsLambdaReceiver: typeof AwsLambdaReceiver;
 
     constructor() {
-        this.receiver = new ExpressReceiver({
+        this.awsLambdaReceiver = new AwsLambdaReceiver({
             signingSecret: process.env.SLACK_SIGNING_SECRET,
-            processBeforeResponse: true,
         });
+
         this.boltApp = new App({
             token: process.env.SLACK_BOT_TOKEN,
             signingSecret: process.env.SLACK_SIGNING_SECRET,
-            receiver: this.receiver
+            receiver: this.awsLambdaReceiver
         });
 
         this.boltApp.use(async ({context, next}: { context: Context, next: () => Promise<void> }) => {
@@ -53,7 +53,7 @@ class SlackClient {
     }
 
     getReceiver() {
-        return this.receiver;
+        return this.awsLambdaReceiver;
     }
 }
 

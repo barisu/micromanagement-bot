@@ -19,9 +19,9 @@ COPY . .
 RUN pnpm build
 
 # Production stage
-FROM gcr.io/distroless/nodejs20-debian12
+FROM public.ecr.aws/lambda/nodejs:22
 
-WORKDIR /app
+WORKDIR  ${LAMBDA_TASK_ROOT}
 
 # Copy built assets and production dependencies
 COPY --from=builder /app/dist ./dist
@@ -31,4 +31,4 @@ COPY --from=builder /app/package.json ./
 # Set user to non-root
 USER nonroot
 
-CMD ["dist/src/index.js"]
+CMD ["dist/src/index.handler"]
