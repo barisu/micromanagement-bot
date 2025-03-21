@@ -56,7 +56,9 @@ Resources:
                   - ecr:UploadLayerPart
                   - ecr:CompleteLayerUpload
                   - ecr:PutImage
-                Resource: !Sub arn:aws:ecr:ap-northeast-1:${AWS::AccountId}:repository/micromanagement-bot*
+                Resource:
+                  - !Sub arn:aws:ecr:ap-northeast-1:${AWS::AccountId}:repository/micromanagement-bot*
+                  - !Sub arn:aws:ecr:ap-northeast-1:${AWS::AccountId}:repository/serverless-micromanagement-bot*
               
               # ECR認証トークン取得 (リソース制限なし)
               - Effect: Allow
