@@ -3,7 +3,7 @@ frameworkVersion: "4"
 provider:
   name: aws
   runtime: provided.al2
-  profile: serverless-servicename-agent
+  profile: ${env:CI, undefined:serverless-servicename-agent}
   region: ap-northeast-1
   stage: dev
   ecr:
