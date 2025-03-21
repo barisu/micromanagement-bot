@@ -57,3 +57,4 @@ jobs:
         REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
