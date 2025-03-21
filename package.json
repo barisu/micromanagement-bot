@@ -2,7 +2,7 @@
   "name": "management-bot",
   "version": "1.0.0",
   "description": "",
-  "packageManager": "pnpm@8.9.0",
+  "packageManager": "pnpm@9.0.0",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
