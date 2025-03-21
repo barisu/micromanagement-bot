@@ -1,60 +1,63 @@
-name: Deploy to AWS Lambda
+name: Deploy to AWS
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
-permissions:
-  id-token: write
-  contents: read
+env:
+  AWS_REGION: ap-northeast-1
+  ECR_REPOSITORY: micromanagement-bot-dev
+  STACK_NAME: micromanagement-bot-dev
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsServerlessDeployRole
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Setup pnpm cache
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'pnpm'
-        
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsServerlessDeployRole
-        aws-region: ap-northeast-1
-        
-    - name: Install dependencies
-      run: pnpm install
-      
-    - name: Install Serverless Framework
-      run: pnpm add -g serverless
-      
-    - name: Deploy to AWS Lambda
-      run: serverless deploy
-      env:
-        SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-        TASK_LIST_ID: ${{ secrets.TASK_LIST_ID }}
-        CLIENT_ID: ${{ secrets.CLIENT_ID }}
-        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
-        REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
-        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Deploy CloudFormation stack
+        run: |
+          aws cloudformation deploy \
+            --template-file infra/template.yml \
+            --stack-name ${{ env.STACK_NAME }} \
+            --parameter-overrides \
+              Stage=dev \
+              SlackSigningSecret=${{ secrets.SLACK_SIGNING_SECRET }} \
+              SlackBotToken=${{ secrets.SLACK_BOT_TOKEN }} \
+              SlackChannel=${{ secrets.SLACK_CHANNEL }} \
+              TaskListId=${{ secrets.TASK_LIST_ID }} \
+              ClientId=${{ secrets.CLIENT_ID }} \
+              ClientSecret=${{ secrets.CLIENT_SECRET }} \
+              RedirectUri=${{ secrets.REDIRECT_URI }} \
+              RefreshToken=${{ secrets.REFRESH_TOKEN }} \
+              OpenAIApiKey=${{ secrets.OPENAI_API_KEY }} \
+              SlackUserId=${{ secrets.SLACK_USER_ID }} \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --no-fail-on-empty-changeset
