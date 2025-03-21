@@ -1,4 +1,4 @@
-name: Deploy to Cloud Run
+name: Deploy to AWS Lambda
 
 on:
   push:
@@ -12,28 +12,34 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - id: "auth"
-      uses: "google-github-actions/auth@v1"
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
       with:
-        credentials_json: "${{ secrets.GCLOUD_AUTH }}"
-
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
       with:
-        project_id: ${{ secrets.PROJECT_ID }}
-
-    - name: Configure docker for artifact registry
-      run: |
-        gcloud auth configure-docker asia-northeast1-docker.pkg.dev
-
-    - name: Build
-      run: |
-        docker build -t asia-northeast1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/micromanagement-bot/production:$GITHUB_SHA . 
-
-    - name: Push to Artifact Registry
-      run: |
-        docker push asia-northeast1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/micromanagement-bot/production:$GITHUB_SHA
-
-    - name: Deploy to Cloud Run
-      run: |
-        gcloud run deploy micromanagement-bot --image asia-northeast1-docker.pkg.dev/${{ secrets.PROJECT_ID }}/micromanagement-bot/production:$GITHUB_SHA --platform managed --region asia-northeast1 --allow-unauthenticated --max-instances 1 --port 3000
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsServerlessDeployRole
+        aws-region: ap-northeast-1
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Serverless Framework
+      run: npm install -g serverless
+      
+    - name: Deploy to AWS Lambda
+      run: serverless deploy
+      env:
+        SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+        TASK_LIST_ID: ${{ secrets.TASK_LIST_ID }}
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+        REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}

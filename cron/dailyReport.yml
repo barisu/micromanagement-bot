@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create an EventBridge Rule to trigger a Lambda function on a schedule.
+
+Parameters:
+  LambdaFunctionArn:
+    Type: String
+    Description: The ARN of the Lambda function to trigger.
+  ScheduleExpression:
+    Type: String
+    Default: 'cron(0 11 * * ? *)'
+    Description: The cron expression for the schedule (UTC). Example cron(0 11 * * ? *) for 11 AM UTC daily.
+  EventRuleName:
+    Type: String
+    Default: 'ScheduledLambdaTrigger'
+    Description: The name of the EventBridge Rule.
+  EventBusName:
+    Type: String
+    Default: 'default'
+    Description: The name of the EventBus to associate with the rule.
+
+Resources:
+  ScheduledRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Ref EventRuleName
+      ScheduleExpression: !Ref ScheduleExpression
+      EventBusName: !Ref EventBusName
+      State: ENABLED
+      Targets:
+        - Id: LambdaTarget
+          Arn: !Ref LambdaFunctionArn
+          Input: |
+            {
+              "eventType": "dailyReport"
+            }
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunctionArn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt ScheduledRule.Arn
+
+Outputs:
+  EventRuleArn:
+    Description: "The ARN of the EventBridge Rule"
+    Value: !GetAtt ScheduledRule.Arn
