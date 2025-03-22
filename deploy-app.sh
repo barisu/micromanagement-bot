@@ -6,7 +6,7 @@ source .env
 
 # AWS リージョンとスタック名を設定
 AWS_REGION="ap-northeast-1"
-INFRA_STACK_NAME="micromanagement-bot-dev"
+INFRA_STACK_NAME="micromanagement-bot-infra-dev"
 APP_STACK_NAME="micromanagement-bot-app-dev"
 ECR_REPOSITORY="micromanagement-bot-dev"
 IMAGE_TAG=$(git rev-parse --short HEAD)
