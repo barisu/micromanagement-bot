@@ -1,4 +1,4 @@
-import { APIGatewayEvent, Context, ProxyCallback } from 'aws-lambda';
+import type { AwsEvent, AwsCallback } from '@slack/bolt/dist/receivers/AwsLambdaReceiver';
 import { SlackController } from './SlackController';
 import SlackClient from '../src/lib/SlackBot';
 
@@ -21,17 +21,21 @@ export class LambdaController {
      * Lambda関数のハンドラー
      */
     public async handleEvent(
-        event: APIGatewayEvent | CustomBridgeEvent, 
-        context: Context, 
-        callback: ProxyCallback
+        event: AwsEvent | CustomBridgeEvent,
+        context: any,
+        callback: AwsCallback
     ) {
         // EventBridgeからの定期実行イベントの処理
         if ('eventType' in event && event.eventType === 'dailyReport') {
             await this.slackController.handleDailyReport();
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ message: 'Daily report processed successfully' })
+            };
         }
 
         // Slackイベントの処理
         const handler = await this.slackClient.getReceiver().start();
-        return handler(event, context, callback);
+        return handler(event as AwsEvent, context, callback);
     }
 }

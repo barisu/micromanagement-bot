@@ -1,11 +1,12 @@
-const { App, AwsLambdaReceiver } = require("@slack/bolt");
-import { Context } from '@slack/bolt';
+import { App,AwsLambdaReceiver, Context } from '@slack/bolt';
 
 class SlackClient {
-    private boltApp: typeof App;
-    private awsLambdaReceiver: typeof AwsLambdaReceiver;
+    private boltApp: App;
+    private awsLambdaReceiver:  AwsLambdaReceiver;
 
     constructor() {
+        if (process.env.SLACK_SIGNING_SECRET == null) 
+            throw new Error('SLACK SIGING SECRET が必要です。'); 
         this.awsLambdaReceiver = new AwsLambdaReceiver({
             signingSecret: process.env.SLACK_SIGNING_SECRET,
         });
