@@ -10,6 +10,8 @@ export class LambdaController {
     private slackClient: SlackClient;
     private slackController: SlackController;
 
+    public static inject = ['slackClient', 'slackController'] as const;
+
     constructor(slackClient: SlackClient, slackController: SlackController) {
         this.slackClient = slackClient;
         this.slackController = slackController;

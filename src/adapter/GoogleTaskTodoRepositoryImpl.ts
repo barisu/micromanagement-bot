@@ -6,6 +6,8 @@ export class GoogleTaskTodoRepositoryImpl implements ToDoService {
     private taskListId: string;
     private tasks: tasks_v1.Tasks;
 
+    public static inject = ['auth', 'taskListId'] as const;
+
     constructor(auth: Auth.OAuth2Client | Auth.GoogleAuth, taskListId: string) {
         this.tasks = google.tasks({ version: "v1", auth: auth });
 

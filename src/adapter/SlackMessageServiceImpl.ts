@@ -7,6 +7,8 @@ export class SlackMessageServiceImpl implements NotifyService {
     private client: SlackClient;
     private todoService: ToDoService;
 
+    public static inject = ['slackClient', 'todoService'] as const;
+
     constructor(client: SlackClient, todoService: ToDoService) {
         this.client = client;
         this.todoService = todoService;

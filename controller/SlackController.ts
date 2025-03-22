@@ -21,6 +21,8 @@ export class SlackController {
         }
     }
 
+    public static inject = ['recentTodosSummaryReportUseCase','slackMessageService'] as const;
+
     /**
      * Slackアプリにイベントリスナーを登録する
      */
