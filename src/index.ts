@@ -1,14 +1,14 @@
 import { GoogleOAuth2 } from './lib/GoogleOAuth2';
 import SlackClient from './lib/SlackBot';
-import { GoogleTasksToDoService } from './adapter/GoogleTasksToDoService';
+import { GoogleTaskTodoRepositoryImpl } from './adapter/GoogleTaskTodoRepositoryImpl';
 import { ToDoService } from './domain/service/ToDoService';
 import { GoogleServiceAccountAuth } from './lib/GoogleServiceAccountAuth';
 import { SayFn } from '@slack/bolt';
 import { GenericMessageEvent } from '@slack/types';
 
 import { ToDoCheck } from './cron/ToDoCheck';
-import { SlackMessageService } from './adapter/SlackMessageService';
-import { OpenAIAdvisorService } from './adapter/OpenAIAdvisorService';
+import { SlackMessageServiceImpl } from './adapter/SlackMessageServiceImpl';
+import { OpenAIAdvisorServiceImpl } from './adapter/OpenAIAdvisorServiceImpl';
 import { RecentTodosSummaryReportUseCase } from './usecase/RecentTodosSummaryReportUseCase';
 
 import {APIGatewayEvent, Context, ProxyCallback,EventBridgeEvent} from 'aws-lambda';
@@ -21,9 +21,9 @@ const auth = isTest ? GoogleServiceAccountAuth.getAuthClient() : GoogleOAuth2.ge
 if (process.env.TASK_LIST_ID == null)
     throw Error('タスクリストIDが指定されていません。');
 
-const todoService: ToDoService = new GoogleTasksToDoService(auth, process.env.TASK_LIST_ID);
-const slackMessageService = new SlackMessageService(slackClient, todoService);
-const openAIAdvisorService = new OpenAIAdvisorService();
+const todoService: ToDoService = new GoogleTaskTodoRepositoryImpl(auth, process.env.TASK_LIST_ID);
+const slackMessageService = new SlackMessageServiceImpl(slackClient, todoService);
+const openAIAdvisorService = new OpenAIAdvisorServiceImpl();
 const recentTodosSummaryReportUseCase = new RecentTodosSummaryReportUseCase(
     todoService,
     openAIAdvisorService

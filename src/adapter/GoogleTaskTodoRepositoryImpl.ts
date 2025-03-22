@@ -2,7 +2,7 @@ import { google, tasks_v1, Auth } from "googleapis";
 import { ToDoService } from "../domain/service/ToDoService";
 import { ToDo } from "../domain/entity/ToDo";
 
-export class GoogleTasksToDoService implements ToDoService {
+export class GoogleTaskTodoRepositoryImpl implements ToDoService {
     private taskListId: string;
     private tasks: tasks_v1.Tasks;
 

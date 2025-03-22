@@ -3,11 +3,11 @@ import { NotifyService } from "../domain/service/NotifyService";
 import { ToDoService } from "../domain/service/ToDoService";
 import SlackClient from "../lib/SlackBot";
 
-export class SlackMessageService implements NotifyService {
+export class SlackMessageServiceImpl implements NotifyService {
     private client: SlackClient;
-    private  todoService: ToDoService;
+    private todoService: ToDoService;
 
-    constructor(client: SlackClient,todoService: ToDoService) {
+    constructor(client: SlackClient, todoService: ToDoService) {
         this.client = client;
         this.todoService = todoService;
     }

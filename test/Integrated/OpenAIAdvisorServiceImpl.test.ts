@@ -1,12 +1,12 @@
-import { OpenAIAdvisorService,LLMModel } from '../../src/adapter/OpenAIAdvisorService';
+import { OpenAIAdvisorServiceImpl, LLMModel } from '../../src/adapter/OpenAIAdvisorServiceImpl';
 import { ToDo } from '../../src/domain/entity/ToDo';
 
-describe('OpenAIAdvisorService Integration Tests', () => {
-    let advisor: OpenAIAdvisorService;
+describe('OpenAIAdvisorServiceImpl Integration Tests', () => {
+    let advisor: OpenAIAdvisorServiceImpl;
     let mockTodos: ToDo[];
 
     beforeEach(() => {
-        advisor = new OpenAIAdvisorService(LLMModel.GPT4omini);
+        advisor = new OpenAIAdvisorServiceImpl(LLMModel.GPT4omini);
         mockTodos = [
             {
                 id: '1',
