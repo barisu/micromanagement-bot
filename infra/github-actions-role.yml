@@ -35,6 +35,10 @@ Resources:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
               StringLike:
                 token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
+          - Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:user/Admin
+            Action: sts:AssumeRole
       Policies:
         - PolicyName: ECRPermissionsPolicy
           PolicyDocument:
@@ -43,6 +47,7 @@ Resources:
               # ECRアクセス - コンテナイメージの管理（必要最小限）
               - Effect: Allow
                 Action:
+                  - ecr:CreateRepository
                   - ecr:GetAuthorizationToken
                   - ecr:BatchCheckLayerAvailability
                   - ecr:GetDownloadUrlForLayer
@@ -75,7 +80,18 @@ Resources:
                   - cloudformation:DescribeStackResource
                   - cloudformation:DescribeStackResources
                   - cloudformation:ValidateTemplate
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DescribeChangeSet
                 Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/micromanagement-bot-*/*
+              
+              # CloudFormationアクセス - 変更セット
+              - Effect: Allow
+                Action:
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DescribeChangeSet
+                Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:changeSet/*
               
               # S3アクセス - デプロイアーティファクト用
               - Effect: Allow

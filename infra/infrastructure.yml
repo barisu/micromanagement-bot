@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template for micromanagement-bot'
+Description: 'CloudFormation template for micromanagement-bot infrastructure'
 
 Parameters:
   Stage:
@@ -57,6 +57,7 @@ Resources:
   # ECRリポジトリ
   MicromanagementBotRepository:
     Type: AWS::ECR::Repository
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub micromanagement-bot-${Stage}
       EncryptionConfiguration:
@@ -85,6 +86,7 @@ Resources:
   # S3バケット（デプロイメントバケット）
   DeploymentBucket:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
     Properties:
       BucketName: !Sub micromanagement-bot-deployments-${Stage}
       BucketEncryption:
@@ -125,54 +127,6 @@ Resources:
                   - logs:PutLogEvents
                 Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/micromanagement-bot-${Stage}-*:*
   
-  # Slack Lambda関数
-  SlackFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: !Sub micromanagement-bot-${Stage}-slack
-      Role: !GetAtt LambdaExecutionRole.Arn
-      PackageType: Image
-      Code:
-        ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${MicromanagementBotRepository}:latest
-      MemorySize: 512
-      Timeout: 30
-      Environment:
-        Variables:
-          SLACK_SIGNING_SECRET: !Ref SlackSigningSecret
-          SLACK_BOT_TOKEN: !Ref SlackBotToken
-          SLACK_CHANNEL: !Ref SlackChannel
-          TASK_LIST_ID: !Ref TaskListId
-          CLIENT_ID: !Ref ClientId
-          CLIENT_SECRET: !Ref ClientSecret
-          REDIRECT_URI: !Ref RedirectUri
-          REFRESH_TOKEN: !Ref RefreshToken
-          OPENAI_API_KEY: !Ref OpenAIApiKey
-          SLACK_USER_ID: !Ref SlackUserId
-  
-  # Daily Report Lambda関数
-  DailyReportFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: !Sub micromanagement-bot-${Stage}-dailyReport
-      Role: !GetAtt LambdaExecutionRole.Arn
-      PackageType: Image
-      Code:
-        ImageUri: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${MicromanagementBotRepository}:latest
-      MemorySize: 512
-      Timeout: 60
-      Environment:
-        Variables:
-          SLACK_SIGNING_SECRET: !Ref SlackSigningSecret
-          SLACK_BOT_TOKEN: !Ref SlackBotToken
-          SLACK_CHANNEL: !Ref SlackChannel
-          TASK_LIST_ID: !Ref TaskListId
-          CLIENT_ID: !Ref ClientId
-          CLIENT_SECRET: !Ref ClientSecret
-          REDIRECT_URI: !Ref RedirectUri
-          REFRESH_TOKEN: !Ref RefreshToken
-          OPENAI_API_KEY: !Ref OpenAIApiKey
-          SLACK_USER_ID: !Ref SlackUserId
-  
   # API Gateway
   ApiGateway:
     Type: AWS::ApiGatewayV2::Api
@@ -200,33 +154,6 @@ Resources:
       StageName: $default
       AutoDeploy: true
   
-  # Slack API Integration
-  SlackApiIntegration:
-    Type: AWS::ApiGatewayV2::Integration
-    Properties:
-      ApiId: !Ref ApiGateway
-      IntegrationType: AWS_PROXY
-      IntegrationUri: !GetAtt SlackFunction.Arn
-      PayloadFormatVersion: '2.0'
-      TimeoutInMillis: 30000
-  
-  # Slack API Route
-  SlackApiRoute:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref ApiGateway
-      RouteKey: POST /slack/events
-      Target: !Sub integrations/${SlackApiIntegration}
-  
-  # Lambda Permission for API Gateway
-  SlackFunctionPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref SlackFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*/*/slack/events
-  
   # EventBridge Schedule Rule
   DailyReportSchedule:
     Type: AWS::Events::Rule
@@ -235,29 +162,40 @@ Resources:
       Description: '毎日20時に実行される定期タスク（日本時間）'
       ScheduleExpression: cron(0 11 * * ? *)
       State: ENABLED
-      Targets:
-        - Arn: !GetAtt DailyReportFunction.Arn
-          Id: DailyReportFunctionTarget
-          Input: '{"eventType":"dailyReport"}'
-  
-  # Lambda Permission for EventBridge
-  DailyReportFunctionPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref DailyReportFunction
-      Principal: events.amazonaws.com
-      SourceArn: !GetAtt DailyReportSchedule.Arn
 
 Outputs:
-  ApiEndpoint:
+  LambdaExecutionRoleArn:
+    Description: Lambda実行ロールのARN
+    Value: !GetAtt LambdaExecutionRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-LambdaExecutionRoleArn
+  
+  ApiGatewayId:
+    Description: API GatewayのID
+    Value: !Ref ApiGateway
+    Export:
+      Name: !Sub ${AWS::StackName}-ApiGatewayId
+  
+  ApiGatewayEndpoint:
     Description: API Gateway endpoint URL
     Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/
+    Export:
+      Name: !Sub ${AWS::StackName}-ApiGatewayEndpoint
   
-  SlackEndpoint:
-    Description: Slack events endpoint URL
-    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/slack/events
+  ECRRepositoryName:
+    Description: ECR Repository Name
+    Value: !Ref MicromanagementBotRepository
+    Export:
+      Name: !Sub ${AWS::StackName}-ECRRepositoryName
   
-  ECRRepository:
-    Description: ECR Repository URL
+  ECRRepositoryUri:
+    Description: ECR Repository URI
     Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${MicromanagementBotRepository}
+    Export:
+      Name: !Sub ${AWS::StackName}-ECRRepositoryUri
+  
+  DailyReportScheduleArn:
+    Description: EventBridge Schedule Rule ARN
+    Value: !GetAtt DailyReportSchedule.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-DailyReportScheduleArn
