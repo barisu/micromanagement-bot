@@ -1,8 +1,9 @@
-
-import { ToDoService } from "../domain/service/ToDoService";
-import { AIAdvisorService } from "../domain/service/AIAdvisorService";
+import { ToDoService } from "../domain/service/ToDoService.ts";
+import { AIAdvisorService } from "../domain/service/AIAdvisorService.ts";
 
 export class RecentTodosSummaryReportUseCase {
+    public static inject = ['todoService', 'aiAdvisorService'] as const;
+
     constructor(
         private todoService: ToDoService,
         private advisorService: AIAdvisorService

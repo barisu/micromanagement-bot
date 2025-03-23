@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
-import { AIAdvisorService } from '../domain/service/AIAdvisorService';
-import { ToDo } from '../domain/entity/ToDo';
+import { AIAdvisorService } from '../domain/service/AIAdvisorService.ts';
+import { ToDo } from '../domain/entity/ToDo.ts';
 
 export enum LLMModel {
     GPT35Turbo = 'gpt-3.5-turbo',
@@ -8,10 +8,12 @@ export enum LLMModel {
     GPT4o = 'gpt-4o',
 }
 
-export class OpenAIAdvisorService implements AIAdvisorService {
+export class OpenAIAdvisorServiceImpl implements AIAdvisorService {
     private openai: OpenAI;
     private model: LLMModel;
     private readonly systemPrompt = "あなたはタスク管理アプリのアドバイザーです。やり取りは基本的に日本語で行います。あなたは常に建設的ですが、軽薄な話し方をします。またカジュアルに人を罵倒します。敬語は使いません。";
+
+    public static inject = [] as const;
 
     constructor(model: LLMModel = LLMModel.GPT4o) {
         this.openai = new OpenAI();

@@ -1,5 +1,5 @@
-import { ToDoService } from "../domain/service/ToDoService";
-import { NotifyService } from "../domain/service/NotifyService";
+import { ToDoService } from "../domain/service/ToDoService.ts";
+import { NotifyService } from "../domain/service/NotifyService.ts";
 
 export class NotifyUpcomingDeadlineUseCase {
   constructor(

@@ -1,6 +1,6 @@
-import { ToDoService } from "../domain/service/ToDoService";
-import { NotifyService } from "../domain/service/NotifyService";
-import { RecentTodosSummaryReportUseCase } from "../usecase/RecentTodosSummaryReportUseCase";
+import { ToDoService } from "../domain/service/ToDoService.ts";
+import { NotifyService } from "../domain/service/NotifyService.ts";
+import { RecentTodosSummaryReportUseCase } from "../usecase/RecentTodosSummaryReportUseCase.ts";
 
 export class ToDoCheck {
 

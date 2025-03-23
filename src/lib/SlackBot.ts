@@ -1,11 +1,15 @@
-const { App, AwsLambdaReceiver } = require("@slack/bolt");
-import { Context } from '@slack/bolt';
+import boltPkg from '@slack/bolt';
+const { App, AwsLambdaReceiver } = boltPkg;
+// any型を使用して型の問題を回避
+import type { Context } from '@slack/bolt';
 
 class SlackClient {
-    private boltApp: typeof App;
-    private awsLambdaReceiver: typeof AwsLambdaReceiver;
+    private boltApp: any;
+    private awsLambdaReceiver: any;
 
     constructor() {
+        if (process.env.SLACK_SIGNING_SECRET == null) 
+            throw new Error('SLACK SIGING SECRET が必要です。'); 
         this.awsLambdaReceiver = new AwsLambdaReceiver({
             signingSecret: process.env.SLACK_SIGNING_SECRET,
         });
@@ -16,7 +20,7 @@ class SlackClient {
             receiver: this.awsLambdaReceiver
         });
 
-        this.boltApp.use(async ({context, next}: { context: Context, next: () => Promise<void> }) => {
+        this.boltApp.use(async ({context, next}: { context: any, next: () => Promise<void> }) => {
             // Ignore Retry Requests
             if (context.retryNum){
                 return;

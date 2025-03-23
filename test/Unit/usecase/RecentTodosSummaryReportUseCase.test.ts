@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { RecentTodosSummaryReportUseCase } from '../../../src/usecase/RecentTodosSummaryReportUseCase';
-import { ToDoService } from '../../../src/domain/service/ToDoService';
-import { AIAdvisorService } from '../../../src/domain/service/AIAdvisorService';
-import { ToDo } from '../../../src/domain/entity/ToDo';
+import { RecentTodosSummaryReportUseCase } from '../../../src/usecase/RecentTodosSummaryReportUseCase.ts';
+import { ToDoService } from '../../../src/domain/service/ToDoService.ts';
+import { AIAdvisorService } from '../../../src/domain/service/AIAdvisorService.ts';
+import { ToDo } from '../../../src/domain/entity/ToDo.ts';
 
 describe('RecentTodosSummaryReportUseCase Tests', () => {
     let useCase: RecentTodosSummaryReportUseCase;

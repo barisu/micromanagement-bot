@@ -1,12 +1,12 @@
 import { describe, it, beforeAll, afterAll, expect } from "vitest";
 import { google, tasks_v1 } from "googleapis";
-import { GoogleTasksToDoService } from "../../src/adapter/GoogleTasksToDoService";
-import { ToDo } from "../../src/domain/entity/ToDo";
+import { GoogleTaskTodoRepositoryImpl } from "../../src/adapter/GoogleTaskTodoRepositoryImpl.ts";
+import { ToDo } from "../../src/domain/entity/ToDo.ts";
 import { readFileSync } from "fs";
-import { SCOPE_URLS } from "../../src/constants";
+import { SCOPE_URLS } from "../../src/constants.ts";
 
-describe("GoogleTasksToDoService Integration Tests", () => {
-  let service: GoogleTasksToDoService;
+describe("GoogleTaskTodoRepositoryImpl Integration Tests", () => {
+  let service: GoogleTaskTodoRepositoryImpl;
   let testTaskListId: string;
   let tasksApi: tasks_v1.Tasks;
 
@@ -35,7 +35,7 @@ describe("GoogleTasksToDoService Integration Tests", () => {
     const taskListId = testTaskListId;
 
     // サービスインスタンスを初期化
-    service = new GoogleTasksToDoService(auth,taskListId);
+    service = new GoogleTaskTodoRepositoryImpl(auth, taskListId);
   });
 
   afterAll(async () => {
@@ -136,5 +136,5 @@ describe("GoogleTasksToDoService Integration Tests", () => {
     await service.deleteToDo(futureTask.id);
     await service.deleteToDo(recentTask.id);
     await service.deleteToDo(oldTask.id);
-});
+  });
 });
