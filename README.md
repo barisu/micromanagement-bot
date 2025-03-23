@@ -85,14 +85,14 @@ mainブランチにプッシュすると、GitHub Actionsワークフロー（`.
 ### 依存関係のインストール
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### ローカル実行
 
 ```bash
-npm run build
-npm start
+pnpm run build
+pnpm start
 ```
 
 ## 定期実行
