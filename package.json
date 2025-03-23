@@ -7,7 +7,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node --loader dotenv/config dist/src/index.js",
+    "start": "node --env-file=.env dist/src/index.js",
     "test": "vitest"
   },
   "keywords": [],
