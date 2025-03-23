@@ -85,22 +85,16 @@ mainブランチにプッシュすると、GitHub Actionsワークフロー（`.
 ### 依存関係のインストール
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### ローカル実行
 
 ```bash
-npm run build
-npm start
-```
-
-### Serverless Frameworkを使用したローカルテスト
-
-```bash
-serverless offline
+pnpm run build
+pnpm start
 ```
 
 ## 定期実行
 
-毎日日本時間20:00（UTC 11:00）に自動的にタスクレポートが生成され、設定されたSlackチャンネルに送信されます。この設定は`serverless.yml`の`functions.dailyReport.events`セクションで変更できます。
+毎日日本時間20:00（UTC 11:00）に自動的にタスクレポートが生成され、設定されたSlackチャンネルに送信されます。この設定は`infrastructure.yml`の`functions.dailyReport.events`セクションで変更できます。
