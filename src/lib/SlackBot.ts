@@ -1,8 +1,11 @@
-import { App,AwsLambdaReceiver, Context } from '@slack/bolt';
+import boltPkg from '@slack/bolt';
+const { App, AwsLambdaReceiver } = boltPkg;
+// any型を使用して型の問題を回避
+import type { Context } from '@slack/bolt';
 
 class SlackClient {
-    private boltApp: App;
-    private awsLambdaReceiver:  AwsLambdaReceiver;
+    private boltApp: any;
+    private awsLambdaReceiver: any;
 
     constructor() {
         if (process.env.SLACK_SIGNING_SECRET == null) 
@@ -17,7 +20,7 @@ class SlackClient {
             receiver: this.awsLambdaReceiver
         });
 
-        this.boltApp.use(async ({context, next}: { context: Context, next: () => Promise<void> }) => {
+        this.boltApp.use(async ({context, next}: { context: any, next: () => Promise<void> }) => {
             // Ignore Retry Requests
             if (context.retryNum){
                 return;
