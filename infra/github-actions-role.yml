@@ -83,6 +83,7 @@ Resources:
                   - cloudformation:CreateChangeSet
                   - cloudformation:ExecuteChangeSet
                   - cloudformation:DescribeChangeSet
+                  - cloudformation:GetTemplateSummary # ← 追加
                 Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/micromanagement-bot-*/*
               
               # CloudFormationアクセス - 変更セット
