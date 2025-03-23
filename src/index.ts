@@ -1,5 +1,5 @@
 import { APIGatewayEvent, Context, ProxyCallback } from 'aws-lambda';
-import { resolveApplicationDependencies } from './di/container';
+import { resolveApplicationDependencies } from './di/container.ts';
 
 // アプリケーションの依存関係を解決
 const { lambdaController } = resolveApplicationDependencies();

@@ -1,14 +1,14 @@
 import { createInjector } from 'typed-inject';
-import { TOKENS, Services } from './tokens';
-import { GoogleOAuth2 } from '../lib/GoogleOAuth2';
-import { GoogleServiceAccountAuth } from '../lib/GoogleServiceAccountAuth';
-import SlackClient from '../lib/SlackBot';
-import { GoogleTaskTodoRepositoryImpl } from '../adapter/GoogleTaskTodoRepositoryImpl';
-import { SlackMessageServiceImpl } from '../adapter/SlackMessageServiceImpl';
-import { OpenAIAdvisorServiceImpl } from '../adapter/OpenAIAdvisorServiceImpl';
-import { RecentTodosSummaryReportUseCase } from '../usecase/RecentTodosSummaryReportUseCase';
-import { SlackController } from '../../controller/SlackController';
-import { LambdaController } from '../../controller/LambdaController';
+import { TOKENS, Services } from './tokens.ts';
+import { GoogleOAuth2 } from '../lib/GoogleOAuth2.ts';
+import { GoogleServiceAccountAuth } from '../lib/GoogleServiceAccountAuth.ts';
+import SlackClient from '../lib/SlackBot.ts';
+import { GoogleTaskTodoRepositoryImpl } from '../adapter/GoogleTaskTodoRepositoryImpl.ts';
+import { SlackMessageServiceImpl } from '../adapter/SlackMessageServiceImpl.ts';
+import { OpenAIAdvisorServiceImpl } from '../adapter/OpenAIAdvisorServiceImpl.ts';
+import { RecentTodosSummaryReportUseCase } from '../usecase/RecentTodosSummaryReportUseCase.ts';
+import { SlackController } from '../../controller/SlackController.ts';
+import { LambdaController } from '../../controller/LambdaController.ts';
 
 /**
  * DIコンテナを作成する

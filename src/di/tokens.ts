@@ -1,8 +1,8 @@
-import { ToDoService } from '../domain/service/ToDoService';
-import { NotifyService } from '../domain/service/NotifyService';
-import { AIAdvisorService } from '../domain/service/AIAdvisorService';
+import { ToDoService } from '../domain/service/ToDoService.ts';
+import { NotifyService } from '../domain/service/NotifyService.ts';
+import { AIAdvisorService } from '../domain/service/AIAdvisorService.ts';
 import { Auth } from 'googleapis';
-import SlackClient from '../lib/SlackBot';
+import SlackClient from '../lib/SlackBot.ts';
 
 // サービスの型定義
 export interface Services {

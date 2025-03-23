@@ -1,6 +1,6 @@
 import { google, tasks_v1, Auth } from "googleapis";
-import { ToDoService } from "../domain/service/ToDoService";
-import { ToDo } from "../domain/entity/ToDo";
+import { ToDoService } from "../domain/service/ToDoService.ts";
+import { ToDo } from "../domain/entity/ToDo.ts";
 
 export class GoogleTaskTodoRepositoryImpl implements ToDoService {
     private taskListId: string;

@@ -1,7 +1,7 @@
-import { ToDo } from "../domain/entity/ToDo";
-import { NotifyService } from "../domain/service/NotifyService";
-import { ToDoService } from "../domain/service/ToDoService";
-import SlackClient from "../lib/SlackBot";
+import { ToDo } from "../domain/entity/ToDo.ts";
+import { NotifyService } from "../domain/service/NotifyService.ts";
+import { ToDoService } from "../domain/service/ToDoService.ts";
+import SlackClient from "../lib/SlackBot.ts";
 
 export class SlackMessageServiceImpl implements NotifyService {
     private client: SlackClient;

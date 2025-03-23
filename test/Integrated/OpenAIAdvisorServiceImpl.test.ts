@@ -1,5 +1,5 @@
-import { OpenAIAdvisorServiceImpl, LLMModel } from '../../src/adapter/OpenAIAdvisorServiceImpl';
-import { ToDo } from '../../src/domain/entity/ToDo';
+import { OpenAIAdvisorServiceImpl, LLMModel } from '../../src/adapter/OpenAIAdvisorServiceImpl.ts';
+import { ToDo } from '../../src/domain/entity/ToDo.ts';
 
 describe('OpenAIAdvisorServiceImpl Integration Tests', () => {
     let advisor: OpenAIAdvisorServiceImpl;

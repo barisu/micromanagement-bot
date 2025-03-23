@@ -1,5 +1,5 @@
 import { google,Auth } from "googleapis";
-import { SCOPE_URLS } from "../constants";
+import { SCOPE_URLS } from "../constants.ts";
 
 export class GoogleServiceAccountAuth {
     private static authClient: Auth.GoogleAuth;

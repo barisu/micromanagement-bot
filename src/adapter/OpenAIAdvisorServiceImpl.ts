@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
-import { AIAdvisorService } from '../domain/service/AIAdvisorService';
-import { ToDo } from '../domain/entity/ToDo';
+import { AIAdvisorService } from '../domain/service/AIAdvisorService.ts';
+import { ToDo } from '../domain/entity/ToDo.ts';
 
 export enum LLMModel {
     GPT35Turbo = 'gpt-3.5-turbo',

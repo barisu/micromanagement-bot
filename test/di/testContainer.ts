@@ -1,13 +1,13 @@
 import { createInjector } from 'typed-inject';
-import { TOKENS } from '../../src/di/tokens';
-import { SlackMessageServiceImpl } from '../../src/adapter/SlackMessageServiceImpl';
-import { RecentTodosSummaryReportUseCase } from '../../src/usecase/RecentTodosSummaryReportUseCase';
-import { SlackController } from '../../controller/SlackController';
-import { LambdaController } from '../../controller/LambdaController';
-import { ToDoService } from '../../src/domain/service/ToDoService';
-import { NotifyService } from '../../src/domain/service/NotifyService';
-import { AIAdvisorService } from '../../src/domain/service/AIAdvisorService';
-import SlackClient from '../../src/lib/SlackBot';
+import { TOKENS } from '../../src/di/tokens.ts';
+import { SlackMessageServiceImpl } from '../../src/adapter/SlackMessageServiceImpl.ts';
+import { RecentTodosSummaryReportUseCase } from '../../src/usecase/RecentTodosSummaryReportUseCase.ts';
+import { SlackController } from '../../controller/SlackController.ts';
+import { LambdaController } from '../../controller/LambdaController.ts';
+import { ToDoService } from '../../src/domain/service/ToDoService.ts';
+import { NotifyService } from '../../src/domain/service/NotifyService.ts';
+import { AIAdvisorService } from '../../src/domain/service/AIAdvisorService.ts';
+import SlackClient from '../../src/lib/SlackBot.ts';
 import { Auth } from 'googleapis';
 
 /**

@@ -1,6 +1,42 @@
-import type { AwsEvent, AwsCallback } from '@slack/bolt/dist/receivers/AwsLambdaReceiver';
-import { SlackController } from './SlackController';
-import SlackClient from '../src/lib/SlackBot';
+// AwsEvent と AwsCallback の型定義
+// slack boltからハードコピーしたもの
+type AwsEventStringParameters = Record<string, string | undefined>;
+type AwsEventMultiValueStringParameters = Record<string, string[] | undefined>;
+
+interface AwsEventV1 {
+    body: string | null;
+    headers: AwsEventStringParameters;
+    isBase64Encoded: boolean;
+    pathParameters: AwsEventStringParameters | null;
+    queryStringParameters: AwsEventStringParameters | null;
+    requestContext: any;
+    stageVariables: AwsEventStringParameters | null;
+    httpMethod: string;
+    multiValueHeaders: AwsEventMultiValueStringParameters;
+    multiValueQueryStringParameters: AwsEventMultiValueStringParameters;
+    path: string;
+    resource: string;
+}
+
+interface AwsEventV2 {
+    body?: string;
+    headers: AwsEventStringParameters;
+    isBase64Encoded: boolean;
+    pathParameters?: AwsEventStringParameters;
+    queryStringParameters?: AwsEventStringParameters;
+    requestContext: any;
+    stageVariables?: AwsEventStringParameters;
+    cookies?: string[];
+    rawPath: string;
+    rawQueryString: string;
+    routeKey: string;
+    version: string;
+}
+
+type AwsEvent = AwsEventV1 | AwsEventV2;
+type AwsCallback = (error?: Error | string | null, result?: any) => void;
+import { SlackController } from './SlackController.ts';
+import SlackClient from '../src/lib/SlackBot.ts';
 
 interface CustomBridgeEvent {
     eventType: string;

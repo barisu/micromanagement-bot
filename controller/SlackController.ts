@@ -1,6 +1,6 @@
 import { App, SayFn, SlackEventMiddlewareArgs } from '@slack/bolt';
-import { RecentTodosSummaryReportUseCase } from "../src/usecase/RecentTodosSummaryReportUseCase";
-import { SlackMessageServiceImpl } from "../src/adapter/SlackMessageServiceImpl";
+import { RecentTodosSummaryReportUseCase } from "../src/usecase/RecentTodosSummaryReportUseCase.ts";
+import { SlackMessageServiceImpl } from "../src/adapter/SlackMessageServiceImpl.ts";
 
 export class SlackController {
     private recentTodosSummaryReportUseCase: RecentTodosSummaryReportUseCase;

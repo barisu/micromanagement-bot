@@ -1,9 +1,9 @@
 import { describe, it, beforeAll, afterAll, expect } from "vitest";
 import { google, tasks_v1 } from "googleapis";
-import { GoogleTaskTodoRepositoryImpl } from "../../src/adapter/GoogleTaskTodoRepositoryImpl";
-import { ToDo } from "../../src/domain/entity/ToDo";
+import { GoogleTaskTodoRepositoryImpl } from "../../src/adapter/GoogleTaskTodoRepositoryImpl.ts";
+import { ToDo } from "../../src/domain/entity/ToDo.ts";
 import { readFileSync } from "fs";
-import { SCOPE_URLS } from "../../src/constants";
+import { SCOPE_URLS } from "../../src/constants.ts";
 
 describe("GoogleTaskTodoRepositoryImpl Integration Tests", () => {
   let service: GoogleTaskTodoRepositoryImpl;

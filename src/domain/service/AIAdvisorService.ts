@@ -1,4 +1,4 @@
-import { ToDo } from "../entity/ToDo";
+import { ToDo } from "../entity/ToDo.ts";
 
 export interface AIAdvisorService {
     analyzeTodoProgress(todos: ToDo[]): Promise<string>;
